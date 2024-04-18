@@ -26,7 +26,8 @@ public class ItemsWebAPI {
     private final DocItemCache docItemCache;
 
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestParam(name = "type", required = false) String type) {
+    public ResponseEntity<?> getAll(@RequestParam(
+            name = "type", required = false) String type) {
 
         if (type != null) {
             var itemType = ItemType.valueOf(type.toUpperCase());
@@ -60,7 +61,7 @@ public class ItemsWebAPI {
             itemType = ItemType.valueOf(dto.getType().toUpperCase());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
-                    .body(new ErrorDto("The type must be hash or doc."));
+                    .body(new ErrorDto("The type must be doc or hash."));
         }
         Item item;
         if (itemType == ItemType.HASH) {
@@ -73,6 +74,30 @@ public class ItemsWebAPI {
         }
         log.debug("Saved {}", item);
         return ResponseEntity.ok(item);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> searchByTypeAndName(
+            @RequestParam(name = "type", required = true) String type,
+            @RequestParam(name = "name", required = true) String name) {
+
+        ItemType itemType;
+        try {
+            itemType = ItemType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErrorDto("The type must be doc or hash."));
+        }
+        Item item;
+        if (itemType == ItemType.HASH) {
+            var result = hashItemCache.findByName(name);
+            log.debug("Search found {} hash items with name '{}'.", result.size(), name);
+            return ResponseEntity.ok(result);
+        } else {
+            var result = docItemCache.findByName(name);
+            log.debug("Search found {} doc items with name '{}'.", result.size(), name);
+            return ResponseEntity.ok(result);
+        }
     }
 
 }
