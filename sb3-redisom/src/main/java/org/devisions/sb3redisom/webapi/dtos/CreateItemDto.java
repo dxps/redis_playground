@@ -1,11 +1,15 @@
 package org.devisions.sb3redisom.webapi.dtos;
 
 import lombok.Data;
+import lombok.NonNull;
 
 @Data
 public class CreateItemDto {
 
-    private String name;
-    private String type;
+    @NonNull
+    private final String name;
+
+    @NonNull
+    private final String type;
 
 }
