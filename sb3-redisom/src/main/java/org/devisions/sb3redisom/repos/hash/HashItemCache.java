@@ -1,7 +1,7 @@
 package org.devisions.sb3redisom.repos.hash;
 
 import com.redis.om.spring.repository.RedisEnhancedRepository;
-import org.devisions.sb3redisom.domain.model.HashItem;
+import org.devisions.sb3redisom.domain.model.hash.HashItem;
 
 import java.util.List;
 

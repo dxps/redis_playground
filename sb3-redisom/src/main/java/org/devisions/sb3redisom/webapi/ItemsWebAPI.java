@@ -2,10 +2,10 @@ package org.devisions.sb3redisom.webapi;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.devisions.sb3redisom.domain.model.DocItem;
-import org.devisions.sb3redisom.domain.model.HashItem;
 import org.devisions.sb3redisom.domain.model.Item;
 import org.devisions.sb3redisom.domain.model.ItemType;
+import org.devisions.sb3redisom.domain.model.doc.DocItem;
+import org.devisions.sb3redisom.domain.model.hash.HashItem;
 import org.devisions.sb3redisom.repos.doc.DocItemCache;
 import org.devisions.sb3redisom.repos.hash.HashItemCache;
 import org.devisions.sb3redisom.webapi.dtos.CreateItemDto;
