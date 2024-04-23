@@ -1,7 +1,8 @@
 package org.devisions.sb3redisom.webapi;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.ArrayList;
+import java.util.UUID;
+
 import org.devisions.sb3redisom.domain.model.Item;
 import org.devisions.sb3redisom.domain.model.ItemType;
 import org.devisions.sb3redisom.domain.model.doc.DocItem;
@@ -11,10 +12,15 @@ import org.devisions.sb3redisom.repos.hash.HashItemCache;
 import org.devisions.sb3redisom.webapi.dtos.CreateItemDto;
 import org.devisions.sb3redisom.webapi.dtos.ErrorDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/items")
@@ -26,8 +32,7 @@ public class ItemsWebAPI {
     private final DocItemCache docItemCache;
 
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestParam(
-            name = "type", required = false) String type) {
+    public ResponseEntity<?> getAll(@RequestParam(name = "type", required = false) String type) {
 
         if (type != null) {
             var itemType = ItemType.valueOf(type.toUpperCase());
@@ -88,7 +93,7 @@ public class ItemsWebAPI {
             return ResponseEntity.badRequest()
                     .body(new ErrorDto("The type must be doc or hash."));
         }
-        Item item;
+
         if (itemType == ItemType.HASH) {
             var result = hashItemCache.findByName(name);
             log.debug("Search found {} hash items with name '{}'.", result.size(), name);
