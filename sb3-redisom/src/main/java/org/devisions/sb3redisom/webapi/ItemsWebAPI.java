@@ -1,6 +1,7 @@
 package org.devisions.sb3redisom.webapi;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.devisions.sb3redisom.domain.model.Item;
@@ -13,6 +14,7 @@ import org.devisions.sb3redisom.webapi.dtos.CreateItemDto;
 import org.devisions.sb3redisom.webapi.dtos.ErrorDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,6 +58,25 @@ public class ItemsWebAPI {
         all.addAll(docItems);
         log.debug("Fetched {} items.", all.size());
         return ResponseEntity.ok(all);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable String id) {
+
+        // First search in doc repo, and if nothing found, search in hash repo.
+        var docOpt = docItemCache.findById(id);
+        if (docOpt.isPresent()) {
+            var doc = docOpt.get();
+            log.debug("Fetched {} by id '{}'.", doc, id);
+            return ResponseEntity.ok(doc);
+        }
+        var hashOpt = hashItemCache.findById(id);
+        if (hashOpt.isPresent()) {
+            var hash = hashOpt.get();
+            log.debug("Fetched {} by id '{}'.", hash, id);
+            return ResponseEntity.ok(hash);
+        }
+        return ResponseEntity.ok(Optional.empty());
     }
 
     @PostMapping

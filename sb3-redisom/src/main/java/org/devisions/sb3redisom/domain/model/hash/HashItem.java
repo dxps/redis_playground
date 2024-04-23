@@ -13,8 +13,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 
 @RedisHash
-@AllArgsConstructor
 @Data
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class HashItem extends Item {
 
