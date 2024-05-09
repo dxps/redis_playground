@@ -1,14 +1,16 @@
 package org.devisions.sb3redisom.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Getter
 public class CacheConfig {
 
     @Value("${cache.redis.hostname}")
@@ -17,11 +19,27 @@ public class CacheConfig {
     @Value("${cache.redis.port}")
     private int port;
 
-    @Value("${cache.docitems.keyspace}")
-    private String docitemsKeyspace;
+    // @Value("${cache.docitems.keyspace}")
+    // private String docitemsKeyspace;
 
-    @Value("${cache.hashitems.keyspace}")
-    private String hashitemsKeyspace;
+    // @Value("${cache.hashitems.keyspace}")
+    // private String hashitemsKeyspace;
+
+    @Bean
+    JedisConnectionFactory jedisConnectionFactory() {
+        JedisConnectionFactory factory = new JedisConnectionFactory(
+                new RedisStandaloneConfiguration(hostname, port));
+        factory.afterPropertiesSet();
+        factory.start();
+        return factory;
+    }
+
+    @Bean
+    RedisTemplate<String, Object> redisTemplate(JedisConnectionFactory jedisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory);
+        return redisTemplate;
+    }
 
     // @Bean
     // public RedisMappingContext keyValueMappingContext() {
