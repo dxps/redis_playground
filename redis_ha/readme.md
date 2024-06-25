@@ -77,3 +77,58 @@ All sentinels are connecting to the master (1st) Redis node and:
 
 1. The slave(s) are discovered automatically.
 2. Their own configuration (`sentinel.conf`) file gets updated.
+
+### Tests
+
+1. Set a key in master and see that it is replicated on the slave.\
+    - On master:
+        ```
+        127.0.0.1:7001> set k1 val1
+        OK
+        127.0.0.1:7001>
+        ```
+    - On slave:
+        ```
+        127.0.0.1:7002> get k1
+        "val1"
+        127.0.0.1:7002>
+        ```
+2. Kill the master.\n
+    - Find the redis servers process ids using `./list_redis_ps.sh`.
+        ```shell
+        ❯ ./list_redis_ps.sh
+        dxps     1403953 1403952  0 14:26 pts/20   00:00:12 redis-server *:7001
+        dxps     1404040 1404039  0 14:26 pts/21   00:00:14 redis-server *:7002
+        ❯
+        ```
+    - Kill the process that is running `redis-server *:7001`.
+        ```shell
+        ❯ kill -9 1403953
+        ❯
+        ```
+3. Verify the result:
+    1. The replica node would report _Error condition on socket for SYNC: Connection refused_ entries.
+    2. The sentinels would discover the master outage, start the voting for the leader, and promote the replica as master. See their output for details.
+    3. Connect to a sentinel and see the state:
+        ```shell
+        ❯ redis-cli -p 5001
+        127.0.0.1:5001>
+        127.0.0.1:5001> sentinel master myMaster
+        1) "name"
+        2) "myMaster"
+        3) "ip"
+        4) "127.0.0.1"
+        5) "port"
+        6) "7002"
+        ```
+    4. Connect to the slave node and get the replication state:
+        ```shell
+        ❯ redis-cli -p 7002
+        127.0.0.1:7002>
+        127.0.0.1:7002> info replication
+        # Replication
+        role:master
+        connected_slaves:0
+        min_slaves_good_slaves:0
+        master_failover_state:no-failover
+        ```
