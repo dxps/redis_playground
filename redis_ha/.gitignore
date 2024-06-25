@@ -1,0 +1,8 @@
+
+*.aof
+*.rdb
+
+## Initial config is enough.
+## The updates that are done by sentinel itself are not relevant.
+sentinel.conf
+
