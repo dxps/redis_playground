@@ -3,14 +3,14 @@
 _High Availability_ feature is offered based on database replication.
 This means having a primary (aka master) and one or more replica (aka slave) nodes with:
 
--   primary node:
-    -   handling both write and read requests
-    -   delivering the changes to replica node(s)
--   replica node(s):
-    -   handling the read requests
-    -   receiving and applying changes locally
+-   Primary node:
+    -   Handling both write and read requests.
+    -   Delivering the changes to replica node(s).
+-   Replica node(s):
+    -   Handling the read requests.
+    -   Receiving and applying changes locally.
 
-Note that this is different than _Cluster_ setup, which implies a data sharding approach, where multiple masters exist, each being responsible with a part of the data. For further details, see [Durability and high availability](https://redis.io/docs/latest/operate/rs/databases/durability-ha/) page.
+Note that this is different than the _Cluster_ setup, which implements a data sharding, where multiple masters exist, each being responsible with a set of the data. For further details, see [Durability and high availability](https://redis.io/docs/latest/operate/rs/databases/durability-ha/) page.
 
 For this setup, Redis [Sentinel](https://redis.io/docs/latest/operate/oss_and_stack/management/sentinel/) is needed. And here is the deployment overview in this case:
 
@@ -57,6 +57,25 @@ For this setup, Redis [Sentinel](https://redis.io/docs/latest/operate/oss_and_st
       │ ╰───────────────────────────────────────────────────────────────────╯ │
       ╰───────────────────────────────────────────────────────────────────────╯
 ```
+
+<br/>
+
+### Prerequisites
+
+To reach the goal of this exercise, Redis Community Edition is enough to have it installed.\
+Furthermore, to use the additional features such as RediSearch or JSON support, Redis Stack is a better option, as it comes with such modules already.
+
+The whole exercise has been done on a Pop!\_OS 22.04 LTS Linux distro. Therefore, to have Redis Stack installed, you can download Redis Stack from the official [Downloads](https://redis.io/downloads/) page. At the time of this writing, [Redis Stack Server 7.4.0](https://packages.redis.io/redis-stack/redis-stack-server-7.4.0-v0.jammy.x86_64.tar.gz) is available and used.
+
+To have the `redis-server` and `redis-sentinel` binaries accessible on the scripts included in this case, extract the archive and have the `${directory}/bin` in the `PATH` env var. Here is an example to have this:
+
+```sh
+export PATH=$PATH:${HOME}/apps/redis-stack-server/bin
+```
+
+<br/>
+
+### Configuration
 
 Here are the initial configuration files for the Redis nodes and the sentinels, before getting updated at their respective startup:
 
@@ -154,7 +173,7 @@ All sentinels are connecting to the master (1st) Redis node and:
 
 ### Tests
 
-1. Set a key in master and see that it is replicated on the slave.\
+1. Set a key in master and see that it is replicated on the slave.<br/>
     - On master:
         ```
         127.0.0.1:7001> set k1 val1
@@ -167,7 +186,7 @@ All sentinels are connecting to the master (1st) Redis node and:
         "val1"
         127.0.0.1:7002>
         ```
-2. Kill the master.\n
+2. Kill the master.<br/>
     - Find the redis servers process ids using `./list_redis_ps.sh`.
         ```shell
         ❯ ./list_redis_ps.sh
