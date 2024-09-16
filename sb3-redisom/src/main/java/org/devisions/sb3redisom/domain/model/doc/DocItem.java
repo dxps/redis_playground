@@ -1,5 +1,6 @@
 package org.devisions.sb3redisom.domain.model.doc;
 
+import com.redis.om.spring.annotations.Searchable;
 import org.devisions.sb3redisom.domain.model.Item;
 import org.devisions.sb3redisom.domain.model.ItemType;
 import org.springframework.data.annotation.Id;
@@ -26,6 +27,8 @@ public class DocItem extends Item {
     private final String name;
 
     @NonNull
+    @Indexed
+    @Searchable
     private final ItemType type;
 
 }
