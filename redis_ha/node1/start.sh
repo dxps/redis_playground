@@ -2,5 +2,5 @@
 
 . ../env.sh
 
-redis-server redis.conf 
+redis-stack-server redis.conf 
 
