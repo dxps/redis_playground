@@ -39,5 +39,5 @@ Obviously, after creating one or more items, get them all to find an id to use i
 
 This feature uses repositories' `findByName()` method.
 
--   Search doc items named 'doc-1' using `curl http://localhost:8080/api/items/search?type=doc&name=doc-1`
--   Search hash items named 'hi 1' using `curl http://localhost:8080/api/items/search?type=hash&name=hi%201`
+-   Search doc items named 'doc-1' using `curl "http://localhost:8080/api/items/search?type=doc&name=doc-1"`
+-   Search hash items named 'hi 1' using `curl "http://localhost:8080/api/items/search?type=hash&name=hi%201"`
