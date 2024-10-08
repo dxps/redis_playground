@@ -1,6 +1,11 @@
 package org.devisions.sb3redisom.config;
 
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.util.StringUtils.commaDelimitedListToSet;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.devisions.sb3redisom.domain.model.doc.DocItem;
 import org.devisions.sb3redisom.domain.model.hash.HashItem;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,13 +21,10 @@ import org.springframework.data.redis.core.convert.MappingConfiguration;
 import org.springframework.data.redis.core.index.IndexConfiguration;
 import org.springframework.data.redis.core.mapping.RedisMappingContext;
 import org.springframework.stereotype.Service;
-import static org.springframework.util.StringUtils.commaDelimitedListToSet;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import redis.clients.jedis.JedisPoolConfig;
-import java.time.Duration;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +37,9 @@ public class CacheConfig {
     @Value("${cache.redis.port}")
     private int port;
 
+    @Value("${cache.redis.password}")
+    private String password;
+
     @Value("${cache.redis.ha.enabled}")
     private boolean redisHaEnabled;
 
@@ -44,11 +49,11 @@ public class CacheConfig {
     @Value("${cache.redis.ha.master.name}")
     private String redisHaMasterName;
 
-     @Value("${cache.docitems.keyspace}")
-     private String docitemsKeyspace;
+    @Value("${cache.docitems.keyspace}")
+    private String docitemsKeyspace;
 
-     @Value("${cache.hashitems.keyspace}")
-     private String hashitemsKeyspace;
+    @Value("${cache.hashitems.keyspace}")
+    private String hashitemsKeyspace;
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
@@ -67,6 +72,7 @@ public class CacheConfig {
         var sentinelConfig = new RedisSentinelConfiguration();
         sentinelConfig.setMaster(redisHaMasterName);
         sentinelConfig.setSentinels(redisNodes);
+        sentinelConfig.setPassword(password);
 
         var poolConfig = new JedisPoolConfig();
         poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(30000));
@@ -95,17 +101,17 @@ public class CacheConfig {
         return redisTemplate;
     }
 
-     @Bean
-     public RedisMappingContext keyValueMappingContext() {
-         return new RedisMappingContext(
-                 new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration() {
-                     @Override
-                     protected Iterable<KeyspaceSettings> initialConfiguration() {
-                         return () -> List.of(
-                                 new KeyspaceSettings(HashItem.class, hashitemsKeyspace),
-                                 new KeyspaceSettings(DocItem.class, docitemsKeyspace)).iterator();
-                     }
-                 }));
-     }
+    @Bean
+    public RedisMappingContext keyValueMappingContext() {
+        return new RedisMappingContext(
+                new MappingConfiguration(new IndexConfiguration(), new KeyspaceConfiguration() {
+                    @Override
+                    protected Iterable<KeyspaceSettings> initialConfiguration() {
+                        return () -> List.of(
+                                new KeyspaceSettings(HashItem.class, hashitemsKeyspace),
+                                new KeyspaceSettings(DocItem.class, docitemsKeyspace)).iterator();
+                    }
+                }));
+    }
 
 }
